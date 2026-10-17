@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu digital</title>
+<style>
+:root{--main:#8a3b12;--gold:#f0a830;--bg:#fff8f0;--ink:#2b1d14;--muted:#6f5f53;--card:#ffffff;--line:#efe1d1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:190px}
+header{background:linear-gradient(135deg,#8a3b12,#c4601f);color:#fff;text-align:center;padding:28px 16px 20px;border-bottom:4px solid var(--gold)}
+header h1{font-family:Georgia,'Times New Roman',serif;font-size:28px;letter-spacing:1px}
+header p{opacity:.92;font-size:14px;margin-top:6px;font-style:italic}
+.lang{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.lang button{background:transparent;border:1px solid rgba(255,255,255,.7);color:#fff;border-radius:16px;padding:5px 14px;font-size:13px;cursor:pointer}
+.lang button.on{background:var(--gold);border-color:var(--gold);color:#2b1d14;font-weight:700}
+.links{display:flex;gap:10px;justify-content:center;padding:14px 12px 4px;flex-wrap:wrap}
+.links a{background:var(--card);border:1px solid var(--line);color:var(--main);text-decoration:none;font-size:14px;font-weight:600;padding:9px 14px;border-radius:20px}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:8px;overflow-x:auto;padding:10px 12px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:8px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--main);border-color:var(--main);color:#fff}
+main{max-width:640px;margin:0 auto;padding:6px 14px}
+h2{font-family:Georgia,serif;color:var(--main);font-size:22px;margin:22px 2px 10px;text-transform:uppercase;letter-spacing:1px;scroll-margin-top:70px}
+.item{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;align-items:center}
+.pic{flex:0 0 72px;height:72px;border-radius:12px;background:linear-gradient(135deg,#fbeacb,#f3d49a);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover}
+.txt{flex:1;min-width:0}
+.name{font-weight:700;font-size:16px}
+.desc{color:var(--muted);font-size:13px;margin-top:3px;line-height:1.35}
+.price{color:var(--main);font-weight:800;font-size:15px;margin-top:6px}
+.act{flex:0 0 auto}
+.btn{border:0;border-radius:10px;background:var(--main);color:#fff;font-weight:700;font-size:14px;padding:9px 12px;cursor:pointer}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:32px;height:32px;border-radius:50%;border:0;background:var(--main);color:#fff;font-size:18px;cursor:pointer}
+.qty span{min-width:18px;text-align:center;font-weight:700}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 14px;display:none;box-shadow:0 -4px 14px rgba(0,0,0,.1)}
+.bar.show{display:block}
+.bar .in{max-width:640px;margin:0 auto}
+.opts{display:flex;gap:6px;margin-bottom:8px}
+.opts button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 4px;font-size:13px;font-weight:600;cursor:pointer}
+.opts button.on{background:var(--gold);border-color:var(--gold);color:#2b1d14}
+.bar input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:14px;margin-bottom:8px;font-family:inherit}
+.bar .send{width:100%;display:block;background:#1fa855;padding:14px;font-size:16px;border-radius:12px;color:#fff;border:0;font-weight:700;cursor:pointer}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 14px}
+[dir=rtl] .txt{text-align:right}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="hName"></h1>
+  <p id="hTag"></p>
+  <div class="lang">
+    <button data-l="fr">FR</button><button data-l="en">EN</button><button data-l="ar">AR</button>
+  </div>
+</header>
+<div class="links" id="links"></div>
+<nav id="nav"></nav>
+<main id="main"></main>
+<div class="bar" id="bar"><div class="in"><div class="opts" id="opts"></div><input id="info" type="text"><button class="send" id="send"></button></div></div>
+<footer id="foot"></footer>
+
+<script>
+/* =========================================================
+   CONFIGURATION — à modifier pour chaque client
+   ========================================================= */
+const CONFIG = {
+  name: "Café Snack Demo",
+  tagline: { fr: "Sandwichs, tacos, jus frais & café", en: "Sandwiches, tacos, fresh juice & coffee", ar: "ساندويتشات، طاكوس، عصائر طازجة وقهوة" },
+  whatsapp: "212600000000",            // numéro sans + ni espaces
+  mapsUrl: "https://maps.google.com/", // lien Google Maps du client
+  reviewUrl: "https://search.google.com/local/writereview", // lien d'avis Google du client
+  currency: "MAD",
+  defaultLang: "fr",
+  demo: true                           // mettre false pour retirer la mention "modèle de démonstration"
+};
+
+/* p = prix, img = URL photo (optionnel), e = emoji de secours, d = description (optionnel) */
+const CATS = [
+  { id: "hot", t: { fr: "Boissons chaudes", en: "Hot drinks", ar: "المشروبات الساخنة" }, items: [
+    { n: { fr: "Café noir", en: "Black coffee", ar: "قهوة سوداء" }, p: 10, e: "☕" },
+    { n: { fr: "Café au lait", en: "Coffee with milk", ar: "قهوة بالحليب" }, p: 14, e: "🥛" },
+    { n: { fr: "Cappuccino", en: "Cappuccino", ar: "كابتشينو" }, p: 18, e: "☕" },
+    { n: { fr: "Thé à la menthe", en: "Mint tea", ar: "أتاي بالنعناع" }, p: 10, e: "🍵" },
+    { n: { fr: "Chocolat chaud", en: "Hot chocolate", ar: "شوكولا ساخنة" }, p: 18, e: "🍫" }
+  ]},
+  { id: "cold", t: { fr: "Jus & boissons fraîches", en: "Juices & cold drinks", ar: "العصائر والمشروبات الباردة" }, items: [
+    { n: { fr: "Jus d'orange pressé", en: "Fresh orange juice", ar: "عصير برتقال طازج" }, p: 15, e: "🍊" },
+    { n: { fr: "Jus d'avocat", en: "Avocado juice", ar: "عصير أفوكادو" }, d: { fr: "Avocat, lait, sucre.", en: "Avocado, milk, sugar.", ar: "أفوكادو، حليب، سكر." }, p: 22, e: "🥑" },
+    { n: { fr: "Banane-lait", en: "Banana milkshake", ar: "موز بالحليب" }, p: 18, e: "🍌" },
+    { n: { fr: "Cocktail de fruits", en: "Fruit cocktail", ar: "كوكتيل فواكه" }, d: { fr: "Fruits de saison, lait.", en: "Seasonal fruits, milk.", ar: "فواكه الموسم، حليب." }, p: 25, e: "🍹" },
+    { n: { fr: "Mojito sans alcool", en: "Virgin mojito", ar: "موهيتو بدون كحول" }, p: 22, e: "🍋" },
+    { n: { fr: "Soda / Eau", en: "Soda / Water", ar: "مشروب غازي / ماء" }, p: 8, e: "🥤" }
+  ]},
+  { id: "sand", t: { fr: "Sandwichs & Tacos", en: "Sandwiches & Tacos", ar: "الساندويتشات والطاكوس" }, items: [
+    { n: { fr: "Sandwich poulet", en: "Chicken sandwich", ar: "ساندويتش دجاج" }, d: { fr: "Poulet, salade, tomate, sauce.", en: "Chicken, lettuce, tomato, sauce.", ar: "دجاج، خس، طماطم، صلصة." }, p: 25, e: "🥪" },
+    { n: { fr: "Sandwich viande hachée", en: "Minced beef sandwich", ar: "ساندويتش كفتة" }, p: 25, e: "🌭" },
+    { n: { fr: "Sandwich thon", en: "Tuna sandwich", ar: "ساندويتش تونة" }, p: 22, e: "🐟" },
+    { n: { fr: "Panini jambon-fromage", en: "Ham & cheese panini", ar: "بانيني جامبون وجبن" }, p: 28, e: "🥖" },
+    { n: { fr: "Tacos poulet", en: "Chicken tacos", ar: "طاكوس دجاج" }, d: { fr: "Poulet, frites, sauce fromagère.", en: "Chicken, fries, cheese sauce.", ar: "دجاج، بطاطس، صلصة الجبن." }, p: 40, e: "🌯" },
+    { n: { fr: "Tacos mixte", en: "Mixed tacos", ar: "طاكوس ميكس" }, p: 50, e: "🌯" },
+    { n: { fr: "Frites", en: "French fries", ar: "بطاطس مقلية" }, p: 15, e: "🍟" }
+  ]},
+  { id: "burger", t: { fr: "Burgers & Pizzas", en: "Burgers & Pizzas", ar: "البرغر والبيتزا" }, items: [
+    { n: { fr: "Burger classique", en: "Classic burger", ar: "برغر كلاسيك" }, p: 35, e: "🍔" },
+    { n: { fr: "Cheeseburger", en: "Cheeseburger", ar: "تشيز برغر" }, p: 40, e: "🍔" },
+    { n: { fr: "Pizza margherita", en: "Margherita pizza", ar: "بيتزا مارغريتا" }, p: 40, e: "🍕" },
+    { n: { fr: "Pizza thon", en: "Tuna pizza", ar: "بيتزا تونة" }, p: 50, e: "🍕" },
+    { n: { fr: "Pizza 4 fromages", en: "4 cheese pizza", ar: "بيتزا 4 أجبان" }, p: 55, e: "🧀" }
+  ]},
+  { id: "sweet", t: { fr: "Desserts & Crêpes", en: "Desserts & Crepes", ar: "الحلويات والكريب" }, items: [
+    { n: { fr: "Crêpe chocolat", en: "Chocolate crepe", ar: "كريب شوكولا" }, p: 20, e: "🥞" },
+    { n: { fr: "Gaufre", en: "Waffle", ar: "غوفر" }, p: 25, e: "🧇" },
+    { n: { fr: "Msemmen miel", en: "Msemmen with honey", ar: "مسمن بالعسل" }, p: 12, e: "🍯" },
+    { n: { fr: "Salade de fruits", en: "Fruit salad", ar: "سلطة فواكه" }, p: 20, e: "🍓" },
+    { n: { fr: "Pâtisserie marocaine", en: "Moroccan pastry", ar: "حلوى مغربية" }, p: 8, e: "🥮" }
+  ]}
+];
+
+const UI = {
+  add: { fr: "Ajouter", en: "Add", ar: "إضافة" },
+  send: { fr: "Envoyer la commande sur WhatsApp", en: "Send order on WhatsApp", ar: "إرسال الطلب عبر واتساب" },
+  maps: { fr: "📍 Itinéraire", en: "📍 Directions", ar: "📍 الموقع" },
+  review: { fr: "⭐ Laisser un avis", en: "⭐ Leave a review", ar: "⭐ اترك تقييما" },
+  wa: { fr: "💬 WhatsApp", en: "💬 WhatsApp", ar: "💬 واتساب" },
+  hello: { fr: "Bonjour, je souhaite commander :", en: "Hello, I would like to order:", ar: "مرحبا، أرغب في طلب:" },
+  total: { fr: "Total", en: "Total", ar: "المجموع" },
+  ask: { fr: "Bonjour,", en: "Hello,", ar: "مرحبا،" },
+  foot: { fr: "Prix en dirhams (MAD), toutes taxes comprises.", en: "Prices in MAD, taxes included.", ar: "الأسعار بالدرهم المغربي شاملة الضرائب." },
+  demo: { fr: "Modèle de démonstration", en: "Demo template", ar: "نموذج تجريبي" },
+  types: {
+    dine: { fr: "Sur place", en: "Dine in", ar: "في المحل" },
+    take: { fr: "À emporter", en: "Takeaway", ar: "للأخذ" },
+    deliv: { fr: "Livraison", en: "Delivery", ar: "توصيل" }
+  },
+  ph: {
+    dine: { fr: "Numéro de table", en: "Table number", ar: "رقم الطاولة" },
+    take: { fr: "Votre nom", en: "Your name", ar: "اسمك" },
+    deliv: { fr: "Adresse de livraison + téléphone", en: "Delivery address + phone", ar: "عنوان التوصيل + الهاتف" }
+  }
+};
+
+let lang = CONFIG.defaultLang;
+let otype = "dine";
+let info = "";
+const cart = {};
+const $ = s => document.querySelector(s);
+const wa = txt => "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(txt);
+
+function render(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  document.title = CONFIG.name;
+  $("#hName").textContent = CONFIG.name;
+  $("#hTag").textContent = CONFIG.tagline[lang];
+  document.querySelectorAll(".lang button").forEach(b => b.classList.toggle("on", b.dataset.l === lang));
+  $("#links").innerHTML =
+    `<a href="${CONFIG.mapsUrl}" target="_blank" rel="noopener">${UI.maps[lang]}</a>` +
+    `<a href="${CONFIG.reviewUrl}" target="_blank" rel="noopener">${UI.review[lang]}</a>` +
+    `<a href="${wa(UI.ask[lang])}" target="_blank" rel="noopener">${UI.wa[lang]}</a>`;
+  $("#nav").innerHTML = CATS.map(c => `<button data-id="${c.id}">${c.t[lang]}</button>`).join("");
+  $("#main").innerHTML = CATS.map((c, ci) => `<section id="s-${c.id}"><h2>${c.t[lang]}</h2>` +
+    c.items.map((it, ii) => {
+      const k = ci + "-" + ii;
+      const pic = it.img ? `<img src="${it.img}" alt="">` : (it.e || "🍽️");
+      const price = it.p != null ? `<div class="price">${it.p} ${CONFIG.currency}</div>` : "";
+      const act = cart[k]
+        ? `<div class="qty"><button data-m="${k}">−</button><span>${cart[k]}</span><button data-p="${k}">+</button></div>`
+        : `<button class="btn" data-p="${k}">${UI.add[lang]}</button>`;
+      return `<div class="item"><div class="pic">${pic}</div><div class="txt"><div class="name">${it.n[lang]}</div>` +
+        (it.d ? `<div class="desc">${it.d[lang]}</div>` : "") + price + `</div><div class="act">${act}</div></div>`;
+    }).join("") + `</section>`).join("");
+  $("#foot").textContent = UI.foot[lang] + (CONFIG.demo ? "  •  " + UI.demo[lang] : "");
+  $("#opts").innerHTML = Object.keys(UI.types).map(t => `<button data-o="${t}" class="${t === otype ? "on" : ""}">${UI.types[t][lang]}</button>`).join("");
+  $("#info").placeholder = UI.ph[otype][lang];
+  $("#info").value = info;
+  updateBar();
+}
+
+function updateBar(){
+  const keys = Object.keys(cart).filter(k => cart[k] > 0);
+  const bar = $("#bar");
+  if (!keys.length){ bar.classList.remove("show"); return; }
+  let total = 0, count = 0;
+  keys.forEach(k => { const [c, i] = k.split("-"); total += CATS[c].items[i].p * cart[k]; count += cart[k]; });
+  $("#send").textContent = `${UI.send[lang]} (${count}) · ${total} ${CONFIG.currency}`;
+  bar.classList.add("show");
+}
+
+function buildOrder(){
+  let total = 0;
+  const lines = Object.keys(cart).filter(k => cart[k] > 0).map(k => {
+    const [c, i] = k.split("-"); const it = CATS[c].items[i];
+    total += it.p * cart[k];
+    return `• ${cart[k]} × ${it.n[lang]} — ${it.p * cart[k]} ${CONFIG.currency}`;
+  });
+  return `${UI.hello[lang]}\n${lines.join("\n")}\n${UI.total[lang]}: ${total} ${CONFIG.currency}\n` +
+         `${UI.types[otype][lang]} — ${UI.ph[otype][lang]}: ${info}`;
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.l){ lang = t.dataset.l; render(); return; }
+  if (t.dataset.o){ otype = t.dataset.o; render(); return; }
+  if (t.dataset.id){ document.getElementById("s-" + t.dataset.id).scrollIntoView({ behavior: "smooth", block: "start" }); document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b === t)); return; }
+  if (t.dataset.p){ cart[t.dataset.p] = (cart[t.dataset.p] || 0) + 1; render(); return; }
+  if (t.dataset.m){ cart[t.dataset.m] = Math.max(0, (cart[t.dataset.m] || 0) - 1); render(); return; }
+  if (t.id === "send"){ window.open(wa(buildOrder()), "_blank"); }
+});
+document.addEventListener("input", e => { if (e.target.id === "info") info = e.target.value; });
+
+const saved = (() => { try { return localStorage.getItem("menu-lang"); } catch (e) { return null; } })();
+if (saved && UI.foot[saved]) lang = saved;
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => { try { localStorage.setItem("menu-lang", b.dataset.l); } catch (e) {} }));
+render();
+</script>
+</body>
+</html>
